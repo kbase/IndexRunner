@@ -28,7 +28,7 @@ COPY . /app
 
 WORKDIR /app
 
-ENV PYTHONPATH=/app/lib
+ENV PYTHONPATH=/app
 ENV KB_DEPLOYMENT_CONFIG=/app/deploy.cfg
 
 CMD [ "./entrypoint.sh" ]

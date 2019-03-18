@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch
 import json
-from IndexRunner.EventUtils import kafka_watcher
+from src.IndexRunner.EventUtils import kafka_watcher
 from confluent_kafka import KafkaError
 import os
 

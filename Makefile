@@ -22,8 +22,7 @@ docker:
 	docker build -t kbase/indexrunner .
 
 test:
-	nosetests -s -x -v --with-coverage --cover-erase --cover-package=IndexRunner --cover-html --cover-html-dir=./test_coverage --nocapture  --nologcapture .
-
+	docker-compose run indexrunner sh scripts/run_tests.sh
 
 clean:
 	rm -rfv $(LBIN_DIR)

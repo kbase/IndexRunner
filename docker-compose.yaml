@@ -50,15 +50,15 @@ services:
       args:
         DEVELOPMENT: 1
     volumes:
+      - ${PWD}:/app
       - /var/run/docker.sock:/var/run/docker.sock
       - ${PWD}/test_local/scratch:/app/work
     tty: true
     depends_on:
       - kafka
     env_file:
-     - ./config-test.ini
+     - .env
     environment:
-      workspace_admin_token: ${CI_ADMIN_TOK}
       PYTHONUNBUFFERED: 1
 
   admin:
@@ -68,13 +68,13 @@ services:
         DEVELOPMENT: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${PWD}:/app
       - ${PWD}/test_local/work:/app/work
     depends_on:
       - kafka
     env_file:
-     - ./config-test.ini
+     - .env
     environment:
-      workspace_admin_token: ${CI_ADMIN_TOK}
       PYTHONUNBUFFERED: 1
     tty: True
     entrypoint: /bin/bash

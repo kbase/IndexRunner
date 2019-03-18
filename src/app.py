@@ -5,19 +5,17 @@ import time
 import logging
 from threading import Thread
 
+from src.load_config import load_config
+
+config = load_config()
+
 # create logger
 logger = logging.getLogger('indexrunner')
-
-# Set Level
-log_level = logging.INFO
-if 'LOG_LEVEL' in os.environ:
-    log_level = getattr(logging, os.environ['LOG_LEVEL'].upper())
-
-logger.setLevel(log_level)
+logger.setLevel(config['log_level'])
 
 # create console handler and set level to debug
 ch = logging.StreamHandler()
-ch.setLevel(log_level)
+ch.setLevel(config['log_level'])
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)

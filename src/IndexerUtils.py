@@ -55,12 +55,12 @@ class IndexerUtils:
         self.ep = EventProducer(config)
         # TODO: access and data specs are not used?
         with open('specs/mapping.yml') as f:
-            self.mapping_spec = yaml.load(f)
+            self.mapping_spec = yaml.safe_load(f)
 
     def _read_mapfile(self, mapfile):
         with open(mapfile) as f:
             d = f.read()
-        mapping = yaml.load(d)['types']
+        mapping = yaml.safe_load(d)['types']
         for type in mapping.keys():
             for index in mapping[type]:
                 name = index['index_name']

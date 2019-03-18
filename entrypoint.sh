@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ ! -z "$CONF_URL" ] ; then
-   ENV="-env $CONF_URL"
+  ENV="-env $CONF_URL"
 fi
 
 if [ ! -z "$SECRET" ] ; then
@@ -17,5 +17,5 @@ fi
 if [ $# -gt 0 ] ; then
   exec $@
 else
-  exec  python app.py
+  exec python src/app.py
 fi

@@ -60,11 +60,8 @@ class IndexerTester(unittest.TestCase):
 
     def reset(self):
         for i in ['genome', 'genomefeature', 'objects', 'sketch']:
-            try:
-                if self.es.indices.exists(index=self._iname(i)):
-                    self.es.indices.delete(index=self._iname(i))
-            except:
-                pass
+            if self.es.indices.exists(index=self._iname(i)):
+                self.es.indices.delete(index=self._iname(i))
 
     def _iname(self, index):
         return '%s.%s' % (self.base, index)
@@ -103,7 +100,7 @@ class IndexerTester(unittest.TestCase):
 
     def prov_test(self):
         iu = IndexerUtils(self.cfg)
-        obj = dict()
+        obj = dict()  # type: dict
         resp = iu._get_prov(obj)
         self.assertIn('prv_meth', resp)
         self.assertIsNone(resp['prv_meth'])

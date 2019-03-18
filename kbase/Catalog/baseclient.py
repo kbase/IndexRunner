@@ -9,19 +9,13 @@ from __future__ import print_function
 
 import json as _json
 import requests as _requests
-import random as _random
+from uuid import uuid4
 import os as _os
-
-try:
-    from configparser import ConfigParser as _ConfigParser  # py 3
-except ImportError:
-    from ConfigParser import ConfigParser as _ConfigParser  # py 2
-
-try:
-    from urllib.parse import urlparse as _urlparse  # py3
-except ImportError:
-    from urlparse import urlparse as _urlparse  # py2
 import time
+
+from configparser import ConfigParser as _ConfigParser  # py 3
+
+from urllib.parse import urlparse as _urlparse  # py3
 
 _CT = 'content-type'
 _AJ = 'application/json'
@@ -164,7 +158,7 @@ class BaseClient(object):
         arg_hash = {'method': method,
                     'params': params,
                     'version': '1.1',
-                    'id': str(_random.random())[2:]
+                    'id': str(uuid4())
                     }
         if context:
             if type(context) is not dict:

@@ -19,7 +19,7 @@ class TokenCache(object):
     _lock = _threading.RLock()
 
     def __init__(self, maxsize=2000):
-        self._cache = {}
+        self._cache = {}  # type: dict
         self._maxsize = maxsize
         self._halfmax = maxsize / 2  # int division to round down
 
@@ -80,7 +80,7 @@ class KBaseAuth(object):
         if not ret.ok:
             try:
                 err = ret.json()
-            except:
+            except Exception:
                 ret.raise_for_status()
             raise ValueError('Error connecting to auth service: {} {}\n{}'
                              .format(ret.status_code, ret.reason,

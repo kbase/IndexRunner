@@ -9,18 +9,12 @@ from __future__ import print_function
 
 import json as _json
 import requests as _requests
-import random as _random
+from uuid import uuid4
 import os as _os
 
-try:
-    from configparser import ConfigParser as _ConfigParser  # py 3
-except ImportError:
-    from ConfigParser import ConfigParser as _ConfigParser  # py 2
+from configparser import ConfigParser as _ConfigParser  # py 3
 
-try:
-    from urllib.parse import urlparse as _urlparse  # py3
-except ImportError:
-    from urlparse import urlparse as _urlparse  # py2
+from urllib.parse import urlparse as _urlparse  # py3
 import time
 
 _CT = 'content-type'
@@ -34,8 +28,8 @@ def _get_token(user_id, password, auth_svc):
     # note that currently globus usernames, and therefore kbase usernames,
     # cannot contain non-ascii characters. In python 2, quote doesn't handle
     # unicode, so if this changes this client will need to change.
-    body = ('user_id=' + _requests.utils.quote(user_id) + '&password=' +
-            _requests.utils.quote(password) + '&fields=token')
+    body = ('user_id=' + _requests.utils.quote(user_id) + '&password=' +  # type: ignore
+            _requests.utils.quote(password) + '&fields=token')  # type: ignore
     ret = _requests.post(auth_svc, data=body, allow_redirects=True)
     status = ret.status_code
     if status >= 200 and status <= 299:
@@ -133,7 +127,7 @@ class BaseClient(object):
             raise ValueError(url + " isn't a valid http url")
         self.url = url
         self.timeout = int(timeout)
-        self._headers = dict()
+        self._headers = dict()  # type: dict
         self.trust_all_ssl_certificates = trust_all_ssl_certificates
         self.lookup_url = lookup_url
         self.async_job_check_time = async_job_check_time_ms / 1000.0
@@ -164,7 +158,7 @@ class BaseClient(object):
         arg_hash = {'method': method,
                     'params': params,
                     'version': '1.1',
-                    'id': str(_random.random())[2:]
+                    'id': str(uuid4())
                     }
         if context:
             if type(context) is not dict:
