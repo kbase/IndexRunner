@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-import unittest
-from nose.plugins.attrib import attr
-
-import os  # noqa: F401
+import datetime
 import json  # noqa: F401
+import os  # noqa: F401
+import unittest
+from configparser import ConfigParser
+from os import environ
 from unittest.mock import patch, Mock
 
-from os import environ
-from configparser import ConfigParser  # py3
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
+from nose.plugins.attrib import attr
 
 from IndexRunner.IndexerUtils import IndexerUtils
-import datetime
 
 
 class IndexerTester(unittest.TestCase):
@@ -41,7 +40,7 @@ class IndexerTester(unittest.TestCase):
         cls.geninfo = cls.read_mock('genome_object_info.json')
         cls.new_version_event = {
             'strcde': 'WS',
-            'accgrp': 1,
+            'wsid': 1,
             'objid': '2',
             'ver': 3,
             'newname': None,
@@ -84,6 +83,20 @@ class IndexerTester(unittest.TestCase):
         bulk(self.es, d)
         for index in indices:
             self.es.indices.refresh(index=self._iname(index))
+
+    def get_indexes_test(self):
+        iu = IndexerUtils(self.cfg)
+        self.assertEqual(iu._get_indexes("KBaseNarrative.Narrative"),
+                         [{'index_method': 'NarrativeIndexer.index',
+                           'index_name': 'ciraw.narrative'}]
+                         )
+        self.assertEqual(iu._get_indexes("Foo.Bar"),
+                         [{'comment': 'Everything without a specific indexer',
+                           'index_method': 'default_indexer',
+                           'index_name': 'ciraw.objects'}])
+        self.assertEqual(iu._get_indexes("KBaseMatrices.ExpressionMatrix"),
+                         [{'index_method': 'KBaseMatrices.index',
+                           'index_name': 'ciraw.KBaseMatrices'}])
 
     @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
     def skip_temp_test(self, wsa):
@@ -142,7 +155,7 @@ class IndexerTester(unittest.TestCase):
         # iu.ws.get_objects2.return_value = {'data': [self.narobj]}
         iu.ws.get_objects2.return_value = self.narobj
         rv = {'docker_img_name': 'mock_indexer:latest'}
-        iu.mr.catalog.get_module_version.return_value = rv
+        iu.method_runner.catalog.get_module_version.return_value = rv
         event = self.new_version_event.copy()
         event['upa'] = '1/2/3'
         res = iu.new_object_version(event)
@@ -156,7 +169,7 @@ class IndexerTester(unittest.TestCase):
         iu.ws.get_objects2.return_value = self.genobj
         iu.ws.get_object_info3.return_value = self.geninfo
         rv = {'docker_img_name': 'mock_indexer:latest'}
-        iu.mr.catalog.get_module_version.return_value = rv
+        iu.method_runner.catalog.get_module_version.return_value = rv
         ev = self.new_version_event.copy()
         ev['objtype'] = 'KBaseGenomes.Genome'
         ev['objid'] = '3'
@@ -205,7 +218,7 @@ class IndexerTester(unittest.TestCase):
         iu.ws.get_objects2.return_value = self.genobj
         iu.ws.get_object_info3.return_value = self.geninfo
         rv = {'docker_img_name': 'mock_indexer:latest'}
-        iu.mr.catalog.get_module_version.return_value = rv
+        iu.method_runner.catalog.get_module_version.return_value = rv
         ev = self.new_version_event.copy()
         ev['objtype'] = None
         ev['objid'] = '3'
@@ -218,28 +231,28 @@ class IndexerTester(unittest.TestCase):
         self.assertIsNotNone(res)
         self.assertIn('ojson', res['_source'])
         self.assertTrue(res['_source']['islast'])
+        self.assertNotIn('objdata', res['_source'])
 
     @attr('online')
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
     @patch('IndexRunner.MethodRunner.Catalog', autospec=True)
-    def index_request_genome_test(self, mock_wsa, mock_cat):
+    def index_request_genome_test(self, mock_cat):
         iu = IndexerUtils(self.cfg)
-        iu.ws.get_workspace_info.return_value = self.wsinfo
-        # iu.ws.get_objects2.return_value = self.genobj
-        iu.ws.get_object_info3.return_value = self.geninfo
         rv = {'docker_img_name': 'test/kb_genomeindexer:latest'}
-        iu.mr.catalog.get_module_version.return_value = rv
+        iu.method_runner.catalog.get_module_version.return_value = rv
         ev = self.new_version_event.copy()
+        wsid = 15792
+        objid = 2
+        ver = 12
         ev['objtype'] = 'KBaseGenomes.Genome'
-        ev['objid'] = '2'
-        ev['accgrp'] = 15792
-        ev['ver'] = 1
-        id = 'WS:15792:2:1'
+        ev['objid'] = str(objid)
+        ev['wsid'] = wsid
+        ev['ver'] = ver
+        id = f'WS:{wsid:d}:{objid:d}:{ver:d}'
         self.reset()
         iu.process_event(ev)
         res = self.es.get(index=self._iname('genome'), routing=id, doc_type='data', id=id)
         self.assertIsNotNone(res)
-        fid = 'WS:15792:2:1:L876_RS0116375'
+        fid = f'WS:{wsid:d}/{objid:d}/{ver:d}:feature/L876_RS0116375'
         res = self.es.get(index=self._iname('genomefeature'), routing=id,
                           doc_type='data', id=fid)
         self.assertIsNotNone(res)
@@ -282,7 +295,7 @@ class IndexerTester(unittest.TestCase):
         self._init_es_genome()
         ev = {
             "strcde": "WS",
-            "accgrp": 1,
+            "wsid": 1,
             "objid": None,
             "ver": None,
             "newname": None,
@@ -362,7 +375,7 @@ class IndexerTester(unittest.TestCase):
         # COPY_ACCESS_GROUP;
         ev = {
             "strcde": "WS",
-            "accgrp": 1,
+            "wsid": 1,
             "objid": None,
             "ver": None,
             "newname": None,
@@ -382,7 +395,7 @@ class IndexerTester(unittest.TestCase):
     def reindex_event_test(self, mock_ep, mock_ws):
         ev = {
             "strcde": "WS",
-            "accgrp": 1,
+            "wsid": 1,
             "objid": None,
             "ver": None,
             "newname": None,
@@ -420,7 +433,7 @@ class IndexerTester(unittest.TestCase):
                 'timestamp': '1234'
             }
         }
-        iu.mr.run.return_value = [index]
+        iu.method_runner.run.return_value = [index]
         ev = self.new_version_event.copy()
         ev['objtype'] = 'KBaseGenomes.Genome'
         ev['objid'] = '3'
@@ -437,5 +450,26 @@ class IndexerTester(unittest.TestCase):
         ev['objtype'] = 'KBaseGenomes.Genome'
         ev['objid'] = '4'
         ev['ver'] = 2
-        iu.mr.run.return_value = [{}]
+        iu.method_runner.run.return_value = [{}]
         iu.process_event(ev)
+        # This will throw an error
+
+    @attr('online')
+    def index_request_misc_test(self):
+        iu = IndexerUtils(self.cfg)
+        ev = self.new_version_event.copy()
+        ev['objtype'] = 'KBaseGenomeAnnotations.Assembly'
+        ev['objid'] = '31'
+        ev['accgrp'] = 7998
+        ev['ver'] = 2
+        id = 'WS:7998:31:2'
+        self.reset()
+        iu.process_event(ev)
+        res = self.es.get(index=self._iname('assembly'), routing=id, doc_type='data', id=id)
+        self.assertIsNotNone(res)
+        # fid = 'WS:15792:2:1:L876_RS0116375'
+        # res = self.es.get(index=self._iname('assemblycontig'), routing=id,
+        #                   doc_type='data', id=fid)
+        # self.assertIsNotNone(res)
+        # self.assertIn('ojson', res['_source'])
+        # self.assertTrue(res['_source']['islast'])
