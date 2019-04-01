@@ -4,7 +4,7 @@
 #
 from confluent_kafka import Consumer, KafkaError
 import json
-from IndexRunner.IndexerUtils import IndexerUtils
+from src.IndexerUtils import IndexerUtils
 import logging
 
 

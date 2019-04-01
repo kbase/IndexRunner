@@ -4,7 +4,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from IndexRunner.EventProducer import EventProducer
+from src.EventProducer import EventProducer
 
 
 class EventProducerTest(unittest.TestCase):
@@ -17,7 +17,7 @@ class EventProducerTest(unittest.TestCase):
             d = f.read()
         cls.objects = json.loads(d)
 
-    @patch('IndexRunner.EventProducer.Producer', autospec=True)
+    @patch('src.EventProducer.Producer', autospec=True)
     def test_producer(self, mock_prod):
         ep = EventProducer({})
         ep.index_objects(self.objects)

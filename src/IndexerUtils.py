@@ -4,16 +4,15 @@ import os
 import re
 import sys
 import traceback
-from time import time
 import datetime
 
 import yaml
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 
-from IndexRunner.EventProducer import EventProducer
-from IndexRunner.MethodRunner import MethodRunner
-from IndexRunner.WSAdminUtils import WorkspaceAdminUtil
+from src.EventProducer import EventProducer
+from src.MethodRunner import MethodRunner
+from src.WSAdminUtils import WorkspaceAdminUtil
 
 # This is the interface that will process indexing
 BULK_MAX = 9
@@ -185,7 +184,7 @@ class IndexerUtils:
         """
         Return the elastic id
         """
-        if not re.match('^\d+\/\d+\/\d+$', upa):
+        if not re.match(r'^\d+\/\d+\/\d+$', upa):
             raise ValueError(f"'{upa}' is not an upa")
         return f"WS:{upa.replace('/', ':')}"
 
@@ -206,7 +205,7 @@ class IndexerUtils:
         if 'method' in prov:
             ret['prv_meth'] = prov['method']
         if 'script' in prov:
-            ret['prv_mod'] = 'legacy_transform'
+            ret['prv_mod'] = 'legacy_transform'  # type: ignore
             ret['prv_meth'] = prov['script']
 
         if 'service_ver' in prov:
@@ -407,7 +406,7 @@ class IndexerUtils:
             return
 
         doc = self._create_obj_rec(upa)
-        extra = {}
+        extra = {}  # type: dict
         if 'default_indexer' not in oindex['index_method']:
             extra = self._run_module(oindex, upa)
         self._ensure_mapping_exists(oindex, extra.get('schema'))
@@ -450,8 +449,8 @@ class IndexerUtils:
         wsinfo = self._get_ws_info(wsid)
         if wsinfo['temp']:
             return None
-        public = wsinfo['public']
-        adoc = self._access_rec(wsid, objid, vers, public=public)
+        # public = wsinfo['public']
+        # adoc = self._access_rec(wsid, objid, vers, public=public)
 
         pdoc = self._create_obj_rec(upa)
         extra = self._run_module(oindex, upa)
@@ -459,7 +458,7 @@ class IndexerUtils:
         self._ensure_mapping_exists(oindex, extra['schema'])
         pdoc['pjson'] = json.dumps(parent)
         pguid = self._get_id(upa)
-        recs = []
+        # recs = []
         bdoc = []
         ct = 0
         for row in extra['documents']:

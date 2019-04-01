@@ -61,23 +61,5 @@ services:
     environment:
       PYTHONUNBUFFERED: 1
 
-  admin:
-    build:
-      context: .
-      args:
-        DEVELOPMENT: 1
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${PWD}:/app
-      - ${PWD}/test_local/work:/app/work
-    depends_on:
-      - kafka
-    env_file:
-     - .env
-    environment:
-      PYTHONUNBUFFERED: 1
-    tty: True
-    entrypoint: /bin/bash
-
 volumes:
   es5test:

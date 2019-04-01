@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 from configparser import ConfigParser
 
-from IndexRunner.MethodRunner import MethodRunner
+from src.MethodRunner import MethodRunner
 
 
 class MethodRunnerTest(unittest.TestCase):
@@ -23,7 +23,7 @@ class MethodRunnerTest(unittest.TestCase):
         cls.cfg['token'] = cls.token
         cls.mr = MethodRunner(cls.cfg, token=cls.token)
 
-    @patch('IndexRunner.MethodRunner.Catalog', autospec=True)
+    @patch('src.MethodRunner.Catalog', autospec=True)
     def test_run(self, mock_cat):
         params = {'message': 'Hi', 'workspace_name': 'bogus'}
         mr = MethodRunner(self.cfg, self.token)

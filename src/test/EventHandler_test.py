@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from confluent_kafka import KafkaError
 
-from IndexRunner.EventUtils import kafka_watcher
+from src.EventUtils import kafka_watcher
 
 
 class myerror():
@@ -56,9 +56,9 @@ class MethodRunnerTest(unittest.TestCase):
         cls.ev = json.dumps(ev).encode()
         ev['strcde'] = 'BOGUS'
         cls.badev = json.dumps(ev).encode()
-        cls.mock_log = patch('IndexRunner.EventUtils.logging', autospec=True).start()
-        cls.mock_in = patch('IndexRunner.EventUtils.IndexerUtils', autospec=True).start()
-        cls.mock_con = patch('IndexRunner.EventUtils.Consumer', autospec=True).start()
+        cls.mock_log = patch('src.EventUtils.logging', autospec=True).start()
+        cls.mock_in = patch('src.EventUtils.IndexerUtils', autospec=True).start()
+        cls.mock_con = patch('src.EventUtils.Consumer', autospec=True).start()
 
     def _remove_error_file(self):
         if os.path.exists('error.log'):

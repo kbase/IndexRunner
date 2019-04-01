@@ -11,7 +11,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 from nose.plugins.attrib import attr
 
-from IndexRunner.IndexerUtils import IndexerUtils
+from src.IndexerUtils import IndexerUtils
 
 
 class IndexerTester(unittest.TestCase):
@@ -98,7 +98,7 @@ class IndexerTester(unittest.TestCase):
                          [{'index_method': 'KBaseMatrices.index',
                            'index_name': 'ciraw.KBaseMatrices'}])
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
     def skip_temp_test(self, wsa):
         iu = IndexerUtils(self.cfg)
         wsi = self.wsinfo
@@ -147,8 +147,8 @@ class IndexerTester(unittest.TestCase):
         with self.assertRaises(ValueError):
             iu._get_id('blah')
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
-    @patch('IndexRunner.MethodRunner.Catalog', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.MethodRunner.Catalog', autospec=True)
     def index_object_test(self, mock_wsa, mock_cat):
         iu = IndexerUtils(self.cfg)
         iu.ws.get_workspace_info.return_value = self.wsinfo
@@ -161,8 +161,8 @@ class IndexerTester(unittest.TestCase):
         res = iu.new_object_version(event)
         self.assertIsNotNone(res)
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
-    @patch('IndexRunner.MethodRunner.Catalog', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.MethodRunner.Catalog', autospec=True)
     def index_request_test(self, mock_wsa, mock_cat):
         iu = IndexerUtils(self.cfg)
         iu.ws.get_workspace_info.return_value = self.wsinfo
@@ -192,8 +192,8 @@ class IndexerTester(unittest.TestCase):
         self.assertIsNotNone(res)
         self.assertFalse(res['_source']['islast'])
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
-    @patch('IndexRunner.MethodRunner.Catalog', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.MethodRunner.Catalog', autospec=True)
     def index_request_default_test(self, mock_wsa, mock_cat):
         iu = IndexerUtils(self.cfg)
         iu.ws.get_workspace_info.return_value = self.wsinfo
@@ -210,8 +210,8 @@ class IndexerTester(unittest.TestCase):
         self.assertIsNotNone(res)
         self.assertTrue(res['_source']['islast'])
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
-    @patch('IndexRunner.MethodRunner.Catalog', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.MethodRunner.Catalog', autospec=True)
     def index_new_all_test(self, mock_wsa, mock_cat):
         iu = IndexerUtils(self.cfg)
         iu.ws.get_workspace_info.return_value = self.wsinfo
@@ -234,7 +234,7 @@ class IndexerTester(unittest.TestCase):
         self.assertNotIn('objdata', res['_source'])
 
     @attr('online')
-    @patch('IndexRunner.MethodRunner.Catalog', autospec=True)
+    @patch('src.MethodRunner.Catalog', autospec=True)
     def index_request_genome_test(self, mock_cat):
         iu = IndexerUtils(self.cfg)
         rv = {'docker_img_name': 'test/kb_genomeindexer:latest'}
@@ -269,7 +269,7 @@ class IndexerTester(unittest.TestCase):
         iu.process_event(ev)
         self.assertTrue(os.path.exists('error.log'))
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
     def publish_test(self, ws_mock):
         """
         Publish and unpublish tests
@@ -331,7 +331,7 @@ class IndexerTester(unittest.TestCase):
                           doc_type='data', id=id)
         self.assertFalse(res['_source']['public'])
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
     def delete_event_test(self, mock_ws):
         # DELETE_ALL_VERSIONS,
         # UNDELETE_ALL_VERSIONS,
@@ -369,8 +369,8 @@ class IndexerTester(unittest.TestCase):
         iu.process_event(ev)
         # Basically make sure this doesn't fail with an error
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
-    @patch('IndexRunner.IndexerUtils.EventProducer', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.IndexerUtils.EventProducer', autospec=True)
     def copy_event_test(self, mock_ep, mock_ws):
         # COPY_ACCESS_GROUP;
         ev = {
@@ -390,8 +390,8 @@ class IndexerTester(unittest.TestCase):
         iu.process_event(ev)
         iu.ep.index_objects.assert_called()
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
-    @patch('IndexRunner.IndexerUtils.EventProducer', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.IndexerUtils.EventProducer', autospec=True)
     def reindex_event_test(self, mock_ep, mock_ws):
         ev = {
             "strcde": "WS",
@@ -410,8 +410,8 @@ class IndexerTester(unittest.TestCase):
         iu.process_event(ev)
         iu.ep.index_objects.assert_called()
 
-    @patch('IndexRunner.IndexerUtils.WorkspaceAdminUtil', autospec=True)
-    @patch('IndexRunner.IndexerUtils.MethodRunner', autospec=True)
+    @patch('src.IndexerUtils.WorkspaceAdminUtil', autospec=True)
+    @patch('src.IndexerUtils.MethodRunner', autospec=True)
     def index_raw_test(self, mock_wsa, mock_cat):
         iu = IndexerUtils(self.cfg)
         iu.mapping['KBaseGenomes.Genome'] = [
