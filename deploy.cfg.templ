@@ -17,6 +17,7 @@ mapping-file={{ default .Env.mapping_file "./mapping.yaml" }}
 
 kafka-server =  {{ default .Env.kafka_server "kafka" }}
 kafka-topic = {{ default .Env.kafka_topic "wsevents" }}
+kafka-index-topic = {{ default .Env.kafka_index_topic "idxevents" }}
 kafka-clientgroup = {{ default .Env.kafka_clientgroup "index_runner" }}
 
 scratch = {{ default .Env.scratch "/scratch" }}
