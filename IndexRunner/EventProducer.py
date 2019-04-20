@@ -22,7 +22,7 @@ class EventProducer():
             (objtype, objtypever) = obj[2].split('-')
             evt = {
                 'strcde': 'WS',
-                'accgrp': obj[6],
+                'wsid': obj[6],
                 'objid': '%s' % (obj[0]),
                 'ver': obj[4],
                 'newname': None,
